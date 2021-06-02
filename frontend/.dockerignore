@@ -1,0 +1,11 @@
+# Exclude everything
+**
+# Include only
+!index.js
+!package.json
+!yarn.lock
+!craco.config.js
+!tailwind.config.js
+!public
+!src
+!.env

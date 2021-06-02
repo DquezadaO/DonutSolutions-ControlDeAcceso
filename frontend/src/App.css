@@ -1,0 +1,11 @@
+.layoutContainer{
+    width: 100%;
+}
+#demo-simple-select{
+    background-color: #fff;
+    border: 2px solid rgb(216, 216, 216);
+}
+
+#demo-simple-select:hover{
+    border: 2px solid rgb(199, 199, 199);
+}
