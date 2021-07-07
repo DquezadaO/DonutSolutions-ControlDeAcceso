@@ -1,0 +1,16 @@
+{
+  "name": "rasberry-pi-gate-server",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "git@gitlab.com:donut-solutions/rasberry-pi-gate-server.git",
+  "author": "Donut Solutions",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "onoff": "^6.0.3"
+  }
+}
