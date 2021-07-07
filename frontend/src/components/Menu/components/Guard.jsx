@@ -3,10 +3,10 @@ import React from 'react';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import DashboardIcon from '@material-ui/icons/Dashboard';
+import AssignmentIcon from '@material-ui/icons/Assignment';
+import FlashOnIcon from '@material-ui/icons/FlashOn';
 import HistoryIcon from '@material-ui/icons/History';
 import PeopleIcon from '@material-ui/icons/People';
-import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined';
 import { useHistory } from 'react-router-dom';
 
 const baseUrl = '/app/guardia';
@@ -18,22 +18,22 @@ export default function GuardMenu() {
     <div>
       <ListItem button onClick={() => history.push(baseUrl)}>
         <ListItemIcon>
-          <DashboardIcon />
+          <FlashOnIcon />
         </ListItemIcon>
-        <ListItemText primary="Inicio" />
+        <ListItemText primary="Ingreso automático" />
       </ListItem>
-      <ListItem button onClick={() => history.push(baseUrl + '/add-visit')}>
+      <ListItem button onClick={() => history.push(baseUrl + '/visit-entries')}>
         <ListItemIcon>
-          <PersonAddOutlinedIcon />
+          <AssignmentIcon />
         </ListItemIcon>
-        <ListItemText primary="Registrar Visita" />
+        <ListItemText primary="Ingreso manual" />
       </ListItem>
 
       <ListItem button onClick={() => history.push(baseUrl + '/display-history')}>
         <ListItemIcon>
           <HistoryIcon />
         </ListItemIcon>
-        <ListItemText primary="Historial visitas" />
+        <ListItemText primary="Historial ingresos" />
       </ListItem>
 
       <ListItem button onClick={() => history.push(baseUrl + '/display-residents')}>

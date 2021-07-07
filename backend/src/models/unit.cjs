@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.hasMany(models.user, { onDelete: 'cascade' });
       this.hasMany(models.car, { onDelete: 'cascade' });
+      this.hasMany(models.entry, { onDelete: 'cascade' });
     }
   }
   Unit.init(

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import MaterialTable from 'material-table';
 
-import { getUnits } from '../../services/donutApi/backoffice';
+import { getUnits, deleteResident, editResident } from '../../services/donutApi/backoffice';
 import { newResident, getResidents } from '../../services/donutApi/residents';
 import Localization from '../../utils/localization';
 import { primaryBlue } from '../../utils/styles';
@@ -85,20 +85,33 @@ export default function Residents() {
                 });
               }, 600);
             }),
-          // onRowUpdate: (newData) =>
-          //   new Promise((resolve) => {
-          //     setTimeout(() => {
-          //       resolve();
-          //       alert('Endpoint no implementado');
-          //     }, 600);
-          //   }),
-          // onRowDelete: (oldData) =>
-          //   new Promise((resolve) => {
-          //     setTimeout(() => {
-          //       resolve();
-          //       alert('Endpoint no implementado');
-          //     }, 600);
-          //   }),
+          onRowUpdate: async (newData, oldData) => {
+            const { id, firstName, lastName, email, phone } = newData;
+
+            setLoading(true);
+            try {
+              await editResident(id, { firstName, lastName, email, phone });
+              const dataUpdate = [...data];
+              const index = oldData.tableData.id;
+              dataUpdate[index] = newData;
+              setData([...dataUpdate]);
+            } catch {
+              alert('Ocurrió un error al editar el registro');
+            }
+            setLoading(false);
+          },
+          onRowDelete: async (oldData) => {
+            const { id } = oldData;
+            setLoading(true);
+            try {
+              await deleteResident(id);
+              const aux = [...data].filter((x) => x.id !== id);
+              setData(aux);
+            } catch {
+              alert('Ocurrió un error al borrar el registro');
+            }
+            setLoading(false);
+          },
         }}
       />
     </div>

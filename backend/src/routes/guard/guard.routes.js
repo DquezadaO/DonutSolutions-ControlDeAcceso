@@ -8,13 +8,14 @@ import {
   newVisitEntry,
   newProviderEntry,
   uploadFileToS3,
-  scheduleVisit,
+  registerEntry,
+  getCondominiumEntries,
 } from './guard.controller';
 import {
   detectLicensePlateValidate,
   newVisitEntryValidate,
   newProviderEntryValidate,
-  scheduleVisitValidate,
+  registerEntryValidate,
 } from './guard.validator';
 
 const extractFile = multer({
@@ -31,6 +32,7 @@ const router = express.Router();
 // Get
 //=
 router.get('/getCondominiumVisits', getCondominiumVisits);
+router.get('/getCondominiumEntries', getCondominiumEntries);
 //=
 // Post
 //=
@@ -42,6 +44,6 @@ router.post('/detectLicensePlate', validate(detectLicensePlateValidate), detectL
 router.post('/newVisitEntry', validate(newVisitEntryValidate), newVisitEntry);
 // Create a new Provider Entry with the given attributes
 router.post('/newProviderEntry', validate(newProviderEntryValidate), newProviderEntry);
-router.post('/scheduleVisit', validate(scheduleVisitValidate), scheduleVisit);
+router.post('/registerEntry', validate(registerEntryValidate), registerEntry);
 
 export default router;

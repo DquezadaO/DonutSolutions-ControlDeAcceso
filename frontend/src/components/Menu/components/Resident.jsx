@@ -25,7 +25,7 @@ export default function ResidentMenu() {
         <ListItemIcon>
           <HistoryIcon />
         </ListItemIcon>
-        <ListItemText primary="Historial visitas" />
+        <ListItemText primary="Visitas agendadas" />
       </ListItem>
     </div>
   );

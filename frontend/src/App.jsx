@@ -10,10 +10,10 @@ import Providers from './views/backoffice/Providers';
 import RegisterCarForm from './views/backoffice/RegisterCarForm';
 import Residents from './views/backoffice/Residents';
 import Dashboard from './views/Dashboard';
-import AddGuardVisit from './views/guard/AddVisit';
-import DisplayVisits from './views/guard/DisplayVisits';
+import DisplayEntries from './views/guard/DisplayEntries';
 import PlateRecognition from './views/guard/PlateRecognition';
 import DisplayResidents from './views/guard/Residents';
+import GuardVisitEntries from './views/guard/VisitEntries';
 import Login from './views/Login';
 import AddVisit from './views/resident/AddVisit';
 import ResidentHistory from './views/resident/ResidentHistory';
@@ -34,8 +34,8 @@ function GuardRoutes({ match }) {
   return (
     <>
       <RouteWrapper exact path={`${match.url}/`} component={PlateRecognition} />
-      <RouteWrapper exact path={`${match.url}/display-history`} component={DisplayVisits} />
-      <RouteWrapper exact path={`${match.url}/add-visit`} component={AddGuardVisit} />
+      <RouteWrapper exact path={`${match.url}/display-history`} component={DisplayEntries} />
+      <RouteWrapper exact path={`${match.url}/visit-entries`} component={GuardVisitEntries} />
       <RouteWrapper exact path={`${match.url}/display-residents`} component={DisplayResidents} />
     </>
   );

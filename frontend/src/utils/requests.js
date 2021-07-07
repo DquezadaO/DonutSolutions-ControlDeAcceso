@@ -26,3 +26,25 @@ export async function get(endpoint, token) {
     : null;
   return axios.get(endpoint, headers);
 }
+
+export async function remove(endpoint, token) {
+  const headers = token
+    ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    : null;
+  return axios.delete(endpoint, headers);
+}
+
+export async function put(endpoint, data, token) {
+  const headers = token
+    ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    : null;
+  return axios.put(endpoint, data, headers);
+}

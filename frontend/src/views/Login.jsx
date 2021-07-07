@@ -31,6 +31,12 @@ function Login() {
     }
     setUser({ email: '', password: '' });
   }
+
+  function handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      onSubmit();
+    }
+  }
   return (
     <div className="flex flex-col justify-center items-center">
       <h1 className="text-white text-4xl sm:text-5xl mb-10">Control de Acceso</h1>
@@ -41,7 +47,7 @@ function Login() {
           type="email"
           placeholder="email"
           value={user.email}
-          onChange={(e) => handleChange(e)}
+          onChange={handleChange}
         />
         <input
           className={formInput}
@@ -49,7 +55,8 @@ function Login() {
           type="password"
           placeholder="contraseña"
           value={user.password}
-          onChange={(e) => handleChange(e)}
+          onChange={handleChange}
+          onKeyPress={handleKeyPress}
         />
       </div>
       <button className={primaryButton} onClick={onSubmit}>

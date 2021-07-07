@@ -1,4 +1,4 @@
-import { post, get } from '../../utils/requests';
+import { post, get, remove, put } from '../../utils/requests';
 import { getCookieFromBrowser } from '../../utils/session';
 
 export async function getCars() {
@@ -82,4 +82,38 @@ export async function newProvider(body) {
     console.error(error);
     return -1;
   }
+}
+
+export async function deleteResident(residentId) {
+  try {
+    const token = await getCookieFromBrowser('token');
+    const response = await remove(`backoffice/user/${residentId}`, token);
+    const data = response.data.data;
+    return data;
+  } catch (error) {
+    console.error(error);
+    return -1;
+  }
+}
+
+export async function editResident(residentId, data) {
+  const token = await getCookieFromBrowser('token');
+  const response = await put(`backoffice/user/${residentId}`, data, token);
+  const responseData = response.data.data;
+  return responseData;
+}
+
+export async function deleteCar(data) {
+  const token = await getCookieFromBrowser('token');
+  const response = await post(`backoffice/deleteCar`, data, token);
+  const responseData = response.data.data;
+  return responseData;
+}
+
+export async function editCar(data) {
+  const token = await getCookieFromBrowser('token');
+  const response = await put(`backoffice/editCar`, data, token);
+  const responseData = response.data.data;
+  return responseData;
+
 }

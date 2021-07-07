@@ -1,5 +1,5 @@
 import { scheduleGenerator } from '../../utils/datetime';
-import { post, get } from '../../utils/requests';
+import { post, get, remove, put } from '../../utils/requests';
 import { getCookieFromBrowser } from '../../utils/session';
 
 export async function newResident(body) {
@@ -71,8 +71,23 @@ export async function addVisit(visit) {
       },
       token,
     );
+    alert('Visita agendada');
   } catch (error) {
     console.error(error);
     return -1;
   }
+}
+
+export async function deleteVisit(visitId) {
+  const token = await getCookieFromBrowser('token');
+  const response = await remove(`resident/visit/${visitId}`, token);
+  const data = response.data.data;
+  return data;
+}
+
+export async function editVisit(visitId, data) {
+  const token = await getCookieFromBrowser('token');
+  const response = await put(`resident/scheduleVisit/${visitId}`, data, token);
+  const responseData = response.data.data;
+  return responseData;
 }

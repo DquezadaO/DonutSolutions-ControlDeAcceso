@@ -1,7 +1,10 @@
 import { RekognitionClient, DetectTextCommand } from '@aws-sdk/client-rekognition';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import sequelize from 'sequelize';
 
 import { awsCredentials, awsRegion } from '../../helpers/constants';
+
+const { Op } = sequelize;
 
 const newVisitEntry = async (req, res) => {
   try {
@@ -141,14 +144,49 @@ const detectLicensePlate = async (req, res) => {
       return res.status(200).send({
         data: {
           isRegisteredCar: !!cars.length,
+          type: 'resident',
           licensePlate: detectedPlate,
           unitId: cars[0].unitId,
         },
       });
     } else {
-      return res.status(200).send({
-        data: { isRegisteredCar: false },
+      const visits = await res.app.locals.orm.visit.findAll({
+        where: {
+          licensePlate: detectedPlate,
+          residentId: {
+            [Op.not]: null,
+          },
+        },
+        include: [
+          {
+            model: res.app.locals.orm.user,
+            as: 'resident',
+          },
+          {
+            model: res.app.locals.orm.visitSchedule,
+            as: 'visitSchedule',
+            where: {
+              end: { [Op.gte]: new Date() },
+            },
+          },
+        ],
       });
+      if (visits.length) {
+        // TODO: handle case where one licensePlate is associated with multiple units
+        return res.status(200).send({
+          data: {
+            isRegisteredCar: true,
+            type: 'visit',
+            licensePlate: detectedPlate,
+            unitId: visits[0].resident.unitId,
+            visitId: visits[0].id,
+          },
+        });
+      } else {
+        return res.status(200).send({
+          data: { isRegisteredCar: false, licensePlate: detectedPlate },
+        });
+      }
     }
   } catch (err) {
     return res.status(500).send(err);
@@ -231,34 +269,68 @@ const uploadFileToS3 = async (req, res) => {
   }
 };
 
-const scheduleVisit = async (req, res) => {
-  const {
-    firstName,
-    lastName,
-    run,
-    phone,
-    licensePlate,
-    scheduleStart,
-    scheduleEnd,
-    residentId,
-  } = req.body;
+const registerEntry = async (req, res) => {
+  const { unitId, type, visitId, visit, licensePlate } = req.body;
+  let _visitId = null;
+  let manualEntry = false;
 
-  const visit = await res.app.locals.orm.visit.create({
-    firstName,
-    lastName,
-    run,
-    phone,
-    licensePlate,
-    residentId,
-  });
-
-  await res.app.locals.orm.visitSchedule.create({
-    start: scheduleStart,
-    end: scheduleEnd,
-    visitId: visit.id,
+  if (type === 'visit') {
+    _visitId = visitId;
+    if (!_visitId) {
+      const _visit = await res.app.locals.orm.visit.create({
+        ...visit,
+      });
+      _visitId = _visit.id;
+      manualEntry = true;
+    }
+  }
+  await res.app.locals.orm.entry.create({
+    unitId,
+    visitId: _visitId,
+    entryTimestamp: new Date(),
+    type,
+    manual: manualEntry,
+    licensePlate: type === 'resident' ? licensePlate : null,
   });
 
   return res.status(201).send();
+};
+
+const getCondominiumEntries = async (req, res) => {
+  try {
+    const role = res.locals.role;
+
+    // Check valid role
+    if (role !== 'guardia') {
+      return res.status(400).send({ error: 'model-error', message: 'User is not guardia' });
+    }
+
+    // Get entries from a condominium
+    const entries = await res.app.locals.orm.entry.findAll({
+      order: [['entryTimestamp', 'DESC']],
+      include: [
+        {
+          model: res.app.locals.orm.unit,
+          as: 'unit',
+          attributes: ['id', 'number'],
+        },
+        {
+          model: res.app.locals.orm.visit,
+          as: 'visit',
+          required: false,
+          attributes: ['licensePlate'],
+        },
+      ],
+      attributes: ['id', 'visitId', 'type', 'entryTimestamp', 'manual', 'licensePlate'],
+    });
+    const response = {
+      data: entries,
+    };
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: 'service-error', message: err });
+  }
 };
 
 export {
@@ -267,5 +339,6 @@ export {
   newVisitEntry,
   newProviderEntry,
   uploadFileToS3,
-  scheduleVisit,
+  registerEntry,
+  getCondominiumEntries,
 };

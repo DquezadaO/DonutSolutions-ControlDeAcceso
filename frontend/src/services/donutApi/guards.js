@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-import { scheduleGenerator } from '../../utils/datetime';
 import { post, get } from '../../utils/requests';
 import { getCookieFromBrowser } from '../../utils/session';
 
@@ -44,36 +43,31 @@ export async function getGuards() {
   }
 }
 
-export async function getVisits() {
-  try {
-    const token = await getCookieFromBrowser('token');
-    const response = await get('guard/getCondominiumVisits', token);
-    const data = response.data.data;
-    return data;
-  } catch (error) {
-    console.error(error);
-    return -1;
+export async function registerEntry(entry) {
+  const data = {
+    unitId: entry.unitId,
+    type: entry.type,
+  };
+  if (entry.type === 'visit') {
+    if (entry.visitId) {
+      data.visitId = entry.visitId;
+    } else {
+      data.visit = {
+        run: entry.visit.run, // req
+        firstName: entry.visit.firstName, // req
+        lastName: entry.visit.lastName, // req
+        phone: entry.visit.phone,
+        licensePlate: entry.visit.licensePlate,
+      };
+    }
+  } else {
+    // resident
+    data.licensePlate = entry.licensePlate;
   }
-}
-
-export async function addVisit(visit) {
   try {
-    const [scheduleStart, scheduleEnd] = scheduleGenerator(visit.arrivalDate);
     const token = await getCookieFromBrowser('token');
-    await post(
-      'guard/scheduleVisit',
-      {
-        firstName: visit.firstName,
-        lastName: visit.lastName,
-        run: visit.run,
-        phone: visit.phone,
-        licensePlate: visit.licensePlate,
-        residentId: parseInt(visit.residentId),
-        scheduleStart,
-        scheduleEnd,
-      },
-      token,
-    );
+    await post('guard/registerEntry', data, token);
+    alert('Ingreso registrado');
   } catch (error) {
     console.error(error);
     return -1;
@@ -109,6 +103,18 @@ export async function plateRecognition(licensePlate) {
       token,
     );
     return response.data.data;
+  } catch (error) {
+    console.error(error);
+    return -1;
+  }
+}
+
+export async function getEntries() {
+  try {
+    const token = await getCookieFromBrowser('token');
+    const response = await get('guard/getCondominiumEntries', token);
+    const data = response.data.data;
+    return data;
   } catch (error) {
     console.error(error);
     return -1;

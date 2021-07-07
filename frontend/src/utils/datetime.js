@@ -9,6 +9,6 @@ export function scheduleGenerator(scheduleTime) {
 }
 
 export function formatDate(datetime) {
-  const newDate = datetime.replace('T', ' ').replace('Z', '').slice(0, 16);
-  return newDate;
+  const newDate = new Date(datetime);
+  return newDate.toLocaleDateString() + ' ' + newDate.toLocaleTimeString();
 }

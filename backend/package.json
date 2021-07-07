@@ -12,7 +12,8 @@
     "dev": "nodemon --es-module-specifier-resolution=node index.js",
     "lint": "yarn eslint ./src ./index.js",
     "lint:fix": "yarn eslint ./src ./index.js --fix",
-    "reset:db": "yarn sequelize db:drop && yarn sequelize db:create && yarn sequelize db:migrate && yarn sequelize db:seed:all"
+    "reset:db": "yarn sequelize db:drop && yarn sequelize db:create && yarn sequelize db:migrate && yarn sequelize db:seed:all",
+    "db:reset": "yarn reset:db"
   },
   "dependencies": {
     "@aws-sdk/client-rekognition": "^3.17.0",

@@ -1,6 +1,6 @@
 import { Joi } from 'express-validation';
 
-export const scheduleVisitValidate = {
+const scheduleVisitValidate = {
   body: Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
@@ -11,3 +11,12 @@ export const scheduleVisitValidate = {
     scheduleEnd: Joi.date().required(),
   }),
 };
+
+const editScheduleVisitValidate = {
+  body: Joi.object({
+    scheduleStart: Joi.date(),
+    scheduleEnd: Joi.date(),
+  }),
+};
+
+export { scheduleVisitValidate, editScheduleVisitValidate };

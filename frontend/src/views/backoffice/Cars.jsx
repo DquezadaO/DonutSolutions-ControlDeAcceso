@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import MaterialTable from 'material-table';
 
-import { newCar, getCars, getUnits } from '../../services/donutApi/backoffice';
+import { newCar, getCars, getUnits, deleteCar, editCar } from '../../services/donutApi/backoffice';
 import Localization from '../../utils/localization';
 import { primaryBlue } from '../../utils/styles';
 
@@ -82,13 +82,33 @@ export default function Cars() {
                 });
               }, 600);
             }),
-          // onRowDelete: (oldData) =>
-          //   new Promise((resolve) => {
-          //     setTimeout(() => {
-          //       resolve();
-          //       alert('Endpoint no implementado');
-          //     }, 600);
-          //   }),
+          onRowUpdate: async (newData, oldData) => {
+            const { unitId, licensePlate, carBrand, carModel, carColor } = newData;
+
+            setLoading(true);
+            try {
+              await editCar({ unitId, licensePlate, carBrand, carModel, carColor });
+              const dataUpdate = [...data];
+              const index = oldData.tableData.id;
+              dataUpdate[index] = newData;
+              setData([...dataUpdate]);
+            } catch {
+              alert('Ocurrió un error al editar el registro');
+            }
+            setLoading(false);
+          },
+          onRowDelete: async (oldData) => {
+            const { id, licensePlate } = oldData;
+            setLoading(true);
+            try {
+              await deleteCar({ licensePlate });
+              const aux = [...data].filter((x) => x.id !== id);
+              setData(aux);
+            } catch {
+              alert('Ocurrió un error al borrar el registro');
+            }
+            setLoading(false);
+          },
         }}
       />
     </div>

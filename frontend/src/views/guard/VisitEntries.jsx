@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-import { TextField } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { addVisit } from '../../services/donutApi/guards';
-import { getResidents } from '../../services/donutApi/residents';
+import { getUnits } from '../../services/donutApi/backoffice';
+import { registerEntry } from '../../services/donutApi/guards';
 import { formInput, primaryButton } from '../../utils/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -21,24 +20,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddVisit() {
+export default function RegisterEntry() {
   const classes = useStyles();
   const [visit, setVisit] = useState({
     firstName: '',
     lastName: '',
     run: '',
-    licensePlate: '',
-    arrivalDate: '',
-    residentId: '',
+    phone: '', // optional
+    licensePlate: '', // optional
+    unitId: 1,
   });
 
-  const [residents, setResidents] = useState([]);
+  const [units, setUnits] = useState([]);
 
   useEffect(() => {
     async function fetchMyAPI() {
       try {
-        const residents = await getResidents();
-        setResidents(residents);
+        const data = await getUnits();
+        setUnits(data.units);
       } catch {}
     }
 
@@ -60,32 +59,23 @@ export default function AddVisit() {
   //   }
 
   async function onSubmit() {
-    if (
-      !visit.firstName ||
-      !visit.lastName ||
-      !visit.run ||
-      !visit.licensePlate ||
-      !visit.arrivalDate ||
-      !visit.residentId
-    ) {
+    if (!visit.firstName || !visit.lastName || !visit.run || !visit.unitId) {
       alert('Debes completar todos los campos');
       return;
     }
-    await addVisit(visit);
+    await registerEntry({ unitId: visit.unitId, type: 'visit', visit });
     setVisit({
       firstName: '',
       lastName: '',
       run: '',
       licensePlate: '',
-      arrivalDate: '',
-      residentId: '',
       phone: '',
-
+      unitId: 1,
     });
   }
   return (
-    <div className="flex flex-col justify-center items-center">
-      <h1 className="text-4xl sm:text-5xl mb-10">Agendar visita</h1>
+    <div className="flex flex-col justify-left items-center">
+      <h1 className="text-4xl sm:text-5xl mb-10">Registrar ingreso de visita</h1>
       <div className="flex flex-col sm:flex-row">
         <input
           className={formInput + ' m-1'}
@@ -121,36 +111,26 @@ export default function AddVisit() {
           value={visit.licensePlate}
           onChange={(e) => handleChange(e)}
         />
-
+      </div>
+      <div className="flex flex-col sm:flex-row">
         <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel id="demo-simple-select-label">Residente</InputLabel>
+          <InputLabel id="demo-simple-select-label">Unidad</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={visit.residentId}
-            name="residentId"
+            value={visit.unitId}
+            name="unitId"
             onChange={(e) => handleChange(e)}
           >
-            {residents.map((r) => (
-              <MenuItem key={r.id} value={r.id}>{`${r.firstName} ${r.lastName}`}</MenuItem>
+            {units.map((u) => (
+              <MenuItem key={u.id} value={u.id}>{`${u.number}`}</MenuItem>
             ))}
           </Select>
         </FormControl>
       </div>
-      <div>
-        <TextField
-          id="datetime-local"
-          label="Hora de llegada"
-          type="datetime-local"
-          name="arrivalDate"
-          onChange={(e) => handleChange(e)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-      </div>
+
       <button className={primaryButton} onClick={() => onSubmit()}>
-        Agendar Visita
+        Registrar Ingreso
       </button>
     </div>
   );

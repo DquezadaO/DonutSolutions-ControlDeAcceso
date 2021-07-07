@@ -7,18 +7,42 @@ import { pickByNotNullOrUndefined } from '../../helpers/utils';
 
 const editUser = async (req, res) => {
   try {
-    const { oldEmail } = req.body;
-    delete req.body.old_email;
+    const { id: userId } = req.params;
     const nonNullOrUndefinedToUpdate = pickByNotNullOrUndefined(req.body);
 
     const user = await res.app.locals.orm.user.findOne({
-      where: { email: oldEmail },
-      attributes: ['id'],
+      where: { id: userId },
+      attributes: ['id', 'email', 'role'],
     });
 
-    if (!oldEmail || !user) {
-      const errObj = { error: 'service-error', message: 'User with given email does not exist.' };
-      throw errObj;
+    if (!user) {
+      return res.status(400).send({ error: 'service-error', message: 'User does not exist.' });
+    }
+    // if (req.body.unitId) {
+    //   if (user.role !== 'residente') {
+    //     return res
+    //       .status(400)
+    //       .send({ error: 'service-error', message: 'Only Resident users can change unitId' });
+    //   } else if (req.body.unitId === 1) {
+    //     return res.status(400).send({
+    //       error: 'service-error',
+    //       message: 'users cannot change unitId to condominium id',
+    //     });
+    //   }
+    // }
+
+    // check that email is not already being used
+    if (req.body.email && req.body.email !== user.email) {
+      const otherUser = await res.app.locals.orm.user.findOne({
+        where: { email: req.body.email },
+        attributes: ['id'],
+      });
+      if (otherUser) {
+        return res.status(400).send({
+          error: 'service-error',
+          message: 'This email is already in use by another user.',
+        });
+      }
     }
 
     const updatedUser = await user.update(nonNullOrUndefinedToUpdate);
@@ -94,8 +118,6 @@ const newUser = async (req, res) => {
       return res.status(400).send({ error: 'model-error', message: 'Error creating new User' });
     }
 
-    console.error(saved);
-
     const response = {
       data: {
         id_user: saved.id,
@@ -117,7 +139,7 @@ const deleteUser = async (req, res) => {
       return res.status(400).send({ error: 'model-error', message: 'User is not backoffice' });
     }
 
-    const { id_user: userId } = req.body;
+    const { id: userId } = req.params;
 
     // Check if user exists
     const user = await res.app.locals.orm.user.findOne({
@@ -202,13 +224,115 @@ const registerCar = async (req, res) => {
       return res.status(400).send({ error: 'model-error', message: 'Error creating new Car' });
     }
 
-    console.error(saved);
-
     const response = {
       data: {
         id_car: saved.id,
       },
     };
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: 'service-error', message: err });
+  }
+};
+
+const editCar = async (req, res) => {
+  try {
+    const role = res.locals.role;
+
+    // Check valid role
+    if (role !== 'backoffice') {
+      return res.status(400).send({ error: 'model-error', message: 'User is not backoffice' });
+    }
+
+    const newValues = {
+      unitId: req.body.unitId,
+      licensePlate: req.body.licensePlate,
+      carBrand: req.body.carBrand,
+      carModel: req.body.carModel,
+      carColor: req.body.carColor,
+    };
+
+    const nonNullOrUndefinedToUpdate = pickByNotNullOrUndefined(newValues);
+
+    // Check if car exists
+    const car = await res.app.locals.orm.car.findOne({
+      where: {
+        licensePlate: newValues.licensePlate,
+      },
+      attributes: ['id'],
+    });
+    if (!car) {
+      return res.status(400).send({ error: 'model-error', message: 'Car doesnt exists' });
+    }
+
+    // If id_unit is sended, check if unit exists
+    if (newValues.unitId) {
+      // Check if Unit is not the one assigned to the guard
+      if (newValues.unitId === 1) {
+        return res
+          .status(400)
+          .send({ error: 'model-error', message: 'Guard cant have a car registered' });
+      }
+
+      const unit = await res.app.locals.orm.unit.findOne({
+        where: { id: newValues.unitId },
+        attributes: ['id'],
+      });
+      if (!unit) {
+        return res.status(400).send({ error: 'model-error', message: 'Unit doesnt exists' });
+      }
+    }
+
+    // Update car record
+    const updatedCar = await car.update(nonNullOrUndefinedToUpdate);
+    if (!updatedCar) {
+      return res.status(400).send({ error: 'model-error', message: 'Error creating new Car' });
+    }
+
+    const response = {
+      data: {
+        id_car: updatedCar.id,
+      },
+    };
+    return res.status(200).send(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: 'service-error', message: err });
+  }
+};
+
+const deleteCar = async (req, res) => {
+  try {
+    const role = res.locals.role;
+
+    // Check valid role
+    if (role !== 'backoffice') {
+      return res.status(400).send({ error: 'model-error', message: 'User is not backoffice' });
+    }
+
+    const { licensePlate } = req.body;
+
+    // Check if license plate exists
+    const car = await res.app.locals.orm.car.findOne({
+      where: {
+        licensePlate,
+      },
+      attributes: ['id'],
+    });
+    if (!car) {
+      return res.status(400).send({ error: 'model-error', message: 'Car doesnt exists' });
+    }
+
+    // If the promise does not fail, the user is deleted
+    await car.destroy();
+
+    const response = {
+      data: {
+        message: 'Car deleted successfully ',
+      },
+    };
+
     return res.status(200).send(response);
   } catch (err) {
     console.error(err);
@@ -259,8 +383,6 @@ const addProvider = async (req, res) => {
     if (!saved) {
       return res.status(400).send({ error: 'model-error', message: 'Error creating new Provider' });
     }
-
-    console.error(saved);
 
     const response = {
       data: {
@@ -355,6 +477,8 @@ export {
   deleteUser,
   getCondominiumCars,
   registerCar,
+  editCar,
+  deleteCar,
   addProvider,
   getProviders,
 };

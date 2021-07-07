@@ -4,8 +4,8 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('providers', [
       {
-        firstName: 'Ignacio',
-        lastName: 'Briones',
+        firstName: 'Don',
+        lastName: 'Jorge',
         run: '234567890',
         phone: '+56998765432',
         licensePlate: 'ASD-123',
@@ -15,8 +15,8 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        firstName: 'Pamela',
-        lastName: 'Jiles',
+        firstName: 'Don',
+        lastName: 'Mario',
         run: '200724437',
         phone: '+56978631267',
         licensePlate: 'ASD-124',
@@ -33,13 +33,13 @@ module.exports = {
       'providers',
       [
         {
-          firstName: 'Ignacio',
-          lastName: 'Briones',
+          firstName: 'Don',
+          lastName: 'Jorge',
           run: '234567890',
         },
         {
-          firstName: 'Pamela',
-          lastName: 'Jiles',
+          firstName: 'Don',
+          lastName: 'Mario',
           run: '200724437',
         },
       ],

@@ -6,6 +6,8 @@ import {
   editUser,
   deleteUser,
   registerCar,
+  editCar,
+  deleteCar,
   getCondominiumCars,
   addProvider,
   getProviders,
@@ -13,8 +15,9 @@ import {
 import {
   newUserValidate,
   editUserValidate,
-  deleteUserValidate,
   registerCarValidate,
+  editCarValidate,
+  deleteCarValidate,
   addProviderValidate,
 } from './backoffice.validator';
 
@@ -35,13 +38,25 @@ router.get('/getProviders', getProviders);
 //=
 // Create a new User with the given attributes
 router.post('/newUser', validate(newUserValidate), newUser);
-// Edit a User with the given attributes
-router.post('/editUser', validate(editUserValidate), editUser);
-// Delete a User with the given userId
-router.post('/deleteUser', validate(deleteUserValidate), deleteUser);
 // Create a new Car and assign it to a Resident
 router.post('/registerCar', validate(registerCarValidate), registerCar);
 // Add a new Provider
 router.post('/addProvider', validate(addProviderValidate), addProvider);
+
+//=
+// Put
+//=
+// Edit an existing Car
+router.put('/editCar', validate(editCarValidate), editCar);
+// Edit a User with the given attributes
+router.put('/user/:id', validate(editUserValidate), editUser);
+
+//=
+// Delete
+//=
+// Delete a car
+router.post('/deleteCar', validate(deleteCarValidate), deleteCar);
+// Delete a User with the given userId
+router.delete('/user/:id', deleteUser);
 
 export default router;

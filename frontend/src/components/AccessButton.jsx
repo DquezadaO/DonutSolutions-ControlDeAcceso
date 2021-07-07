@@ -3,10 +3,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { green, red } from '@material-ui/core/colors';
-import Fab from '@material-ui/core/Fab';
 import { makeStyles } from '@material-ui/core/styles';
-import CheckIcon from '@material-ui/icons/Check';
-import SaveIcon from '@material-ui/icons/Save';
 import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
@@ -47,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AccessButton({ loading, success, detectPlate }) {
+export default function AccessButton({ loading, success, detectPlate, allowEntry }) {
   const classes = useStyles();
 
   const buttonClassname = clsx({
@@ -58,12 +55,6 @@ export default function AccessButton({ loading, success, detectPlate }) {
   return (
     <div className={classes.root}>
       <div className={classes.wrapper}>
-        <Fab aria-label="save" color="primary" className={buttonClassname} onClick={detectPlate}>
-          {success ? <CheckIcon /> : <SaveIcon />}
-        </Fab>
-        {loading && <CircularProgress size={68} className={classes.fabProgress} />}
-      </div>
-      <div className={classes.wrapper}>
         <Button
           variant="contained"
           color="primary"
@@ -72,6 +63,12 @@ export default function AccessButton({ loading, success, detectPlate }) {
           onClick={detectPlate}
         >
           Reconocer Patente
+        </Button>
+        {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+      </div>
+      <div className={classes.wrapper}>
+        <Button variant="contained" color="primary" disabled={loading} onClick={allowEntry}>
+          Permitir Ingreso
         </Button>
         {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
       </div>

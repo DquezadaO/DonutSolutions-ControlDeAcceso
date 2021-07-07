@@ -21,17 +21,25 @@ const newProviderEntryValidate = {
   }),
 };
 
-const scheduleVisitValidate = {
+const registerEntryValidate = {
   body: Joi.object({
-    firstName: Joi.string().required(),
-    residentId: Joi.number().required(),
-    lastName: Joi.string().required(),
-    run: Joi.string().required(),
-    phone: Joi.string(),
-    licensePlate: Joi.string(),
-    scheduleStart: Joi.date().required(),
-    scheduleEnd: Joi.date().required(),
+    unitId: Joi.number().required(),
+    type: Joi.string().valid('visit', 'resident').required(),
+    licensePlate: Joi.string().optional(),
+    visitId: Joi.number().optional(),
+    visit: Joi.object({
+      firstName: Joi.string(),
+      lastName: Joi.string(),
+      run: Joi.string(),
+      phone: Joi.string().allow(''),
+      licensePlate: Joi.string(),
+    }).optional(),
   }),
 };
 
-export { detectLicensePlateValidate, newVisitEntryValidate, newProviderEntryValidate, scheduleVisitValidate };
+export {
+  detectLicensePlateValidate,
+  newVisitEntryValidate,
+  newProviderEntryValidate,
+  registerEntryValidate,
+};

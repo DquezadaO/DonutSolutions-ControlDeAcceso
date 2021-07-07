@@ -2,14 +2,11 @@ import { Joi } from 'express-validation';
 
 const editUserValidate = {
   body: Joi.object({
-    oldEmail: Joi.string().email().required(),
+    email: Joi.string().email(),
     firstName: Joi.string().allow(null),
     lastName: Joi.string().allow(null),
-    email: Joi.string().email().allow(null),
     phone: Joi.string().allow(null),
-    password: Joi.string().allow(null),
-    role: Joi.string().allow(null),
-    idUnit: Joi.number().allow(null),
+    // unitId: Joi.number(),
   }),
 };
 
@@ -25,12 +22,6 @@ const newUserValidate = {
   }),
 };
 
-const deleteUserValidate = {
-  body: Joi.object({
-    id_user: Joi.number().required(),
-  }),
-};
-
 const registerCarValidate = {
   body: Joi.object({
     id_unit: Joi.number().required(),
@@ -38,6 +29,22 @@ const registerCarValidate = {
     car_brand: Joi.string().required(),
     car_model: Joi.string().required(),
     car_color: Joi.string().required(),
+  }),
+};
+
+const editCarValidate = {
+  body: Joi.object({
+    licensePlate: Joi.string().required(),
+    unitId: Joi.number(),
+    carBrand: Joi.string(),
+    carModel: Joi.string(),
+    carColor: Joi.string(),
+  }),
+};
+
+const deleteCarValidate = {
+  body: Joi.object({
+    licensePlate: Joi.string().required(),
   }),
 };
 
@@ -54,7 +61,8 @@ const addProviderValidate = {
 export {
   newUserValidate,
   editUserValidate,
-  deleteUserValidate,
   registerCarValidate,
+  editCarValidate,
+  deleteCarValidate,
   addProviderValidate,
 };

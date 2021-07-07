@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.hasOne(models.visitSchedule, { onDelete: 'cascade' });
+      this.hasOne(models.entry, { onDelete: 'cascade' });
       this.belongsTo(models.user, { foreignKey: 'residentId', as: 'resident' });
     }
   }
@@ -19,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       run: DataTypes.STRING,
       phone: DataTypes.STRING,
       licensePlate: DataTypes.STRING,
-      residentId: DataTypes.INTEGER,
+      residentId: DataTypes.INTEGER, // resident that scheduled visit
     },
     {
       sequelize,
